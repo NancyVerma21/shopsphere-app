@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - ShopSphere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container navbar-content">
+        <a href="{{ url_for('home') }}" class="logo">ShopSphere</a>
+        <nav class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('categories_page') }}">Categories</a>
+            <a href="{{ url_for('orders') }}" class="active">Orders</a>
+        </nav>
+        <div class="nav-actions">
+            <span class="welcome-user">Hi, {{ current_user_name.split()[0] }}</span>
+            <a href="{{ url_for('logout') }}" class="nav-login">Logout</a>
+            <a href="{{ url_for('cart') }}" class="cart-link">Cart ({{ cart_count }})</a>
+        </div>
+    </div>
+</header>
+
+<main class="container page-main">
+
+    <section class="page-header">
+        <div>
+            <span class="section-kicker">MY ACCOUNT</span>
+            <h1>My Orders</h1>
+            <p>View your purchase history and order status.</p>
+        </div>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-stack">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% if orders %}
+        <section class="orders-list">
+            {% for order in orders %}
+                <article class="order-card">
+                    <div class="order-card-top">
+                        <div>
+                            <span class="section-kicker">ORDER</span>
+                            <h2>{{ order.order_number }}</h2>
+                            <p class="order-date">
+                                {{ order.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                            </p>
+                        </div>
+
+                        <div class="order-status-block">
+                            <span class="order-status status-{{ order.status|lower }}">
+                                {{ order.status }}
+                            </span>
+                            <strong>₹{{ "%.2f"|format(order.total_amount) }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="order-card-meta">
+                        <div>
+                            <span>Items</span>
+                            <strong>{{ order.item_count }}</strong>
+                        </div>
+                        <div>
+                            <span>Payment</span>
+                            <strong>{{ order.payment_method or 'N/A' }}</strong>
+                        </div>
+                        <div>
+                            <span>Payment Status</span>
+                            <strong>{{ order.payment_status or 'N/A' }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="order-card-actions">
+                        <a
+                            href="{{ url_for('order_details', order_number=order.order_number) }}"
+                            class="btn secondary-btn"
+                        >
+                            View Order
+                        </a>
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('cancel_order', order_number=order.order_number) }}"
+                        >
+                            <button type="submit" class="btn danger-btn">
+                                Cancel Order
+                            </button>
+                        </form>
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <h2>No orders yet</h2>
+            <p>Your completed purchases will appear here.</p>
+            <a href="{{ url_for('products') }}" class="btn primary-btn">Start Shopping</a>
+        </div>
+    {% endif %}
+
+</main>
+
+<footer class="footer">
+    <div class="container footer-content">
+        <div>
+            <h3>ShopSphere</h3>
+            <p>Your simple online shopping experience.</p>
+        </div>
+        <p>© 2026 ShopSphere</p>
+    </div>
+</footer>
+
+</body>
+</html>

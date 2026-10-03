@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Account - ShopSphere</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .brand a {
+            color: #0f172a;
+            text-decoration: none;
+            font-size: 30px;
+            font-weight: 800;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 15px 40px rgba(15, 23, 42, 0.10);
+            border: 1px solid #e2e8f0;
+        }
+
+        .auth-card h1 {
+            margin: 0 0 8px;
+            color: #0f172a;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .name-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        input {
+            width: 100%;
+            height: 46px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            padding: 0 13px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .submit-btn {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: 9px;
+            background: #2563eb;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .message {
+            padding: 11px 13px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .message.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 22px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .auth-footer a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            color: #2563eb;
+        }
+
+        @media (max-width: 550px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .auth-card {
+                padding: 25px;
+            }
+
+            .name-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="auth-container">
+
+    <div class="brand">
+
+        <a href="/">
+            ShopSphere
+        </a>
+
+    </div>
+
+
+    <div class="auth-card">
+
+        <h1>
+            Create your account
+        </h1>
+
+        <p class="subtitle">
+            Register as a ShopSphere customer.
+        </p>
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="message {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <form
+            method="POST"
+            action="{{ url_for('register') }}"
+        >
+
+            <div class="name-row">
+
+                <div class="form-group">
+
+                    <label for="first_name">
+                        First Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        placeholder="Rahul"
+                        autocomplete="given-name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="last_name">
+                        Last Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="last_name"
+                        name="last_name"
+                        placeholder="Sharma"
+                        autocomplete="family-name"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="rahul@example.com"
+                    autocomplete="email"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Minimum 8 characters"
+                    autocomplete="new-password"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="confirm_password">
+                    Confirm Password
+                </label>
+
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    placeholder="Re-enter password"
+                    autocomplete="new-password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="submit-btn"
+            >
+                Create Account
+            </button>
+
+        </form>
+
+
+        <div class="auth-footer">
+
+            Already have an account?
+
+            <a href="{{ url_for('login') }}">
+                Login
+            </a>
+
+        </div>
+
+
+        <a
+            href="/products"
+            class="back-link"
+        >
+            ← Continue Shopping
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

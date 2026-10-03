@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Products - ShopSphere</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="container navbar-content">
+
+        <a
+            href="{{ url_for('home') }}"
+            class="logo"
+        >
+            ShopSphere
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a
+                href="{{ url_for('products') }}"
+                class="active"
+            >
+                Products
+            </a>
+
+            <a href="{{ url_for('categories_page') }}">
+                Categories
+            </a>
+
+            <a href="{{ url_for('orders') }}">
+                Orders
+            </a>
+
+        </nav>
+
+        <div class="nav-actions">
+
+            {% if logged_in %}
+
+                <span class="welcome-user">
+                    Hi, {{ current_user_name.split()[0] }}
+                </span>
+
+                <a
+                    href="{{ url_for('logout') }}"
+                    class="nav-login"
+                >
+                    Logout
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{{ url_for('login') }}"
+                    class="nav-login"
+                >
+                    Login
+                </a>
+
+            {% endif %}
+
+            <a
+                href="{{ url_for('cart') }}"
+                class="cart-link"
+            >
+                Cart ({{ cart_count }})
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <section class="page-header">
+
+        <div>
+
+            <span class="section-kicker">
+                SHOPSPHERE CATALOG
+            </span>
+
+            <h1>
+                Products
+            </h1>
+
+            <p>
+                Browse, search, filter and sort the current product catalog.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <section class="filters-card">
+
+        <form
+            method="GET"
+            action="{{ url_for('products') }}"
+            class="filters-form"
+        >
+
+            <div class="filter-group">
+
+                <label for="search">
+                    Search
+                </label>
+
+                <input
+                    type="text"
+                    id="search"
+                    name="q"
+                    value="{{ search_query }}"
+                    placeholder="Search products..."
+                >
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                >
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+                    {% for category in categories %}
+
+                    <option
+                        value="{{ category.name }}"
+                        {% if category_filter == category.name %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ category.name }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="sort">
+                    Sort
+                </label>
+
+                <select
+                    id="sort"
+                    name="sort"
+                >
+
+                    <option
+                        value="default"
+                        {% if sort_option == "default" %}
+                            selected
+                        {% endif %}
+                    >
+                        Default
+                    </option>
+
+                    <option
+                        value="price_asc"
+                        {% if sort_option == "price_asc" %}
+                            selected
+                        {% endif %}
+                    >
+                        Price: Low to High
+                    </option>
+
+                    <option
+                        value="price_desc"
+                        {% if sort_option == "price_desc" %}
+                            selected
+                        {% endif %}
+                    >
+                        Price: High to Low
+                    </option>
+
+                    <option
+                        value="name_asc"
+                        {% if sort_option == "name_asc" %}
+                            selected
+                        {% endif %}
+                    >
+                        Name: A to Z
+                    </option>
+
+                    <option
+                        value="name_desc"
+                        {% if sort_option == "name_desc" %}
+                            selected
+                        {% endif %}
+                    >
+                        Name: Z to A
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-actions">
+
+                <button
+                    type="submit"
+                    class="btn primary-btn"
+                >
+                    Apply Filters
+                </button>
+
+                <a
+                    href="{{ url_for('products') }}"
+                    class="btn secondary-btn"
+                >
+                    Reset
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <section class="products-section">
+
+        {% if products %}
+
+            <div class="products-count">
+                {{ products|length }} product(s) found
+            </div>
+
+
+            <div class="product-grid">
+
+                {% for product in products %}
+
+                <article class="product-card">
+
+                    <a
+                        href="{{ url_for('product_details', sku=product.sku) }}"
+                        class="product-image-link"
+                    >
+
+                        <div class="product-image">
+
+                            <img
+                                src="{{ url_for('static', filename='images/' ~ product.sku|lower ~ '.svg') }}"
+                                alt="{{ product.name }}"
+                            >
+
+                        </div>
+
+                    </a>
+
+
+                    <div class="product-card-content">
+
+                        <span class="product-category">
+                            {{ product.category_name }}
+                        </span>
+
+
+                        <h2 class="product-name">
+
+                            <a
+                                href="{{ url_for('product_details', sku=product.sku) }}"
+                            >
+                                {{ product.name }}
+                            </a>
+
+                        </h2>
+
+
+                        <p class="product-description">
+                            {{ product.description }}
+                        </p>
+
+
+                        <div class="product-bottom">
+
+                            <span class="product-price">
+                                ₹{{ "%.2f"|format(product.price) }}
+                            </span>
+
+
+                            {% if product.stock_qty > 0 %}
+
+                                <span class="stock available">
+                                    In Stock
+                                </span>
+
+                            {% else %}
+
+                                <span class="stock unavailable">
+                                    Out of Stock
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <a
+                            href="{{ url_for('product_details', sku=product.sku) }}"
+                            class="btn primary-btn btn-full"
+                        >
+                            View Product
+                        </a>
+
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-state-icon">
+                    🔎
+                </div>
+
+                <h2>
+                    No products found
+                </h2>
+
+                <p>
+                    Try changing your search or filter.
+                </p>
+
+                <a
+                    href="{{ url_for('products') }}"
+                    class="btn primary-btn"
+                >
+                    View All Products
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+
+    <div class="container footer-content">
+
+        <div>
+            <h3>ShopSphere</h3>
+            <p>Your simple online shopping experience.</p>
+        </div>
+
+        <p>
+            © 2026 ShopSphere
+        </p>
+
+    </div>
+
+</footer>
+
+</body>
+</html>

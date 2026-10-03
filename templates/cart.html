@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - ShopSphere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container navbar-content">
+        <a href="{{ url_for('home') }}" class="logo">ShopSphere</a>
+
+        <nav class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('categories_page') }}">Categories</a>
+            <a href="{{ url_for('orders') }}">Orders</a>
+        </nav>
+
+        <div class="nav-actions">
+            {% if logged_in %}
+                <span class="welcome-user">Hi, {{ current_user_name.split()[0] }}</span>
+                <a href="{{ url_for('logout') }}" class="nav-login">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-login">Login</a>
+            {% endif %}
+
+            <a href="{{ url_for('cart') }}" class="cart-link active">
+                Cart ({{ cart_count }})
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="container page-main">
+
+    <section class="page-header">
+        <div>
+            <span class="section-kicker">SHOPPING CART</span>
+            <h1>Your Cart</h1>
+            <p>Review your selected products before checkout.</p>
+        </div>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-stack">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% if cart_items %}
+        <section class="cart-layout">
+            <div class="cart-items">
+
+                {% for item in cart_items %}
+                    <article class="cart-item-card">
+
+                        <div class="cart-item-image">
+                            <img
+                                src="{{ url_for('static', filename='images/' ~ item.sku|lower ~ '.svg') }}"
+                                alt="{{ item.name }}"
+                            >
+                        </div>
+
+                        <div class="cart-item-info">
+                            <span class="product-category">{{ item.sku }}</span>
+
+                            <h2>
+                                <a href="{{ url_for('product_details', sku=item.sku) }}">
+                                    {{ item.name }}
+                                </a>
+                            </h2>
+
+                            <p class="cart-unit-price">
+                                ₹{{ "%.2f"|format(item.unit_price) }} each
+                            </p>
+
+                            {% if item.stock_qty > 0 %}
+                                <span class="stock available">
+                                    {{ item.stock_qty }} in stock
+                                </span>
+                            {% else %}
+                                <span class="stock unavailable">Out of Stock</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="cart-item-controls">
+                            <form
+                                method="POST"
+                                action="{{ url_for('update_cart_item', item_id=item.cart_item_id) }}"
+                                class="quantity-form"
+                            >
+                                <label for="quantity-{{ item.cart_item_id }}">Qty</label>
+
+                                <div class="quantity-controls">
+                                    <input
+                                        type="number"
+                                        id="quantity-{{ item.cart_item_id }}"
+                                        name="quantity"
+                                        value="{{ item.quantity }}"
+                                        min="1"
+                                        max="{{ item.stock_qty if item.stock_qty > 0 else 1 }}"
+                                        required
+                                    >
+
+                                    <button type="submit" class="btn secondary-btn">
+                                        Update
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="cart-item-total">
+                                ₹{{ "%.2f"|format(item.item_total) }}
+                            </div>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('remove_cart_item', item_id=item.cart_item_id) }}"
+                            >
+                                <button type="submit" class="remove-link">Remove</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+
+            </div>
+
+            <aside class="cart-summary">
+                <span class="section-kicker">ORDER SUMMARY</span>
+                <h2>Cart Total</h2>
+
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <strong>₹{{ "%.2f"|format(cart_subtotal) }}</strong>
+                </div>
+
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    {% if shipping_charge == 0 %}
+                        <strong>FREE</strong>
+                    {% else %}
+                        <strong>₹{{ "%.2f"|format(shipping_charge) }}</strong>
+                    {% endif %}
+                </div>
+
+                <p class="shipping-rule">
+                    Free shipping on orders of ₹1,000 or more.
+                </p>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-total">
+                    <span>Total</span>
+                    <strong>₹{{ "%.2f"|format(cart_total) }}</strong>
+                </div>
+
+                <a
+                    href="{{ url_for('checkout') }}"
+                    class="btn primary-btn checkout-btn"
+                >
+                    Proceed to Checkout
+                </a>
+
+                <a
+                    href="{{ url_for('products') }}"
+                    class="continue-shopping"
+                >
+                    ← Continue Shopping
+                </a>
+            </aside>
+        </section>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🛒</div>
+            <h2>Your cart is empty</h2>
+            <p>Add products to your cart to start the checkout process.</p>
+            <a href="{{ url_for('products') }}" class="btn primary-btn">
+                Browse Products
+            </a>
+        </div>
+    {% endif %}
+
+</main>
+
+<footer class="footer">
+    <div class="container footer-content">
+        <div>
+            <h3>ShopSphere</h3>
+            <p>Your simple online shopping experience.</p>
+        </div>
+        <p>© 2026 ShopSphere</p>
+    </div>
+</footer>
+
+</body>
+</html>

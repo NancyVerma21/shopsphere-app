@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - ShopSphere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container navbar-content">
+        <a href="{{ url_for('home') }}" class="logo">ShopSphere</a>
+        <nav class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('categories_page') }}">Categories</a>
+            <a href="{{ url_for('orders') }}">Orders</a>
+        </nav>
+        <div class="nav-actions">
+            <span class="welcome-user">Hi, {{ current_user_name.split()[0] }}</span>
+            <a href="{{ url_for('logout') }}" class="nav-login">Logout</a>
+            <a href="{{ url_for('cart') }}" class="cart-link">Cart ({{ cart_count }})</a>
+        </div>
+    </div>
+</header>
+
+<main class="container page-main">
+
+    <section class="page-header checkout-heading">
+        <div>
+            <span class="section-kicker">CHECKOUT</span>
+            <h1>Delivery & Payment</h1>
+            <p>Enter your delivery details and choose a payment method.</p>
+        </div>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-stack">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('checkout') }}" class="checkout-layout">
+
+        <div class="checkout-main">
+
+            <section class="checkout-card">
+                <div class="checkout-section-title">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h2>Delivery Address</h2>
+                        <p>Select a saved address or enter a new one.</p>
+                    </div>
+                </div>
+
+                {% if addresses %}
+                    <div class="address-list">
+                        {% for address in addresses %}
+                            <label class="address-option">
+                                <input
+                                    type="radio"
+                                    name="address_choice"
+                                    value="saved"
+                                    data-address-id="{{ address.id }}"
+                                    {% if loop.first %}checked{% endif %}
+                                >
+                                <span class="address-radio-content">
+                                    <strong>
+                                        {{ address.label }}
+                                        {% if address.is_default %}
+                                            <span class="address-badge">Default</span>
+                                        {% endif %}
+                                    </strong>
+                                    <span>{{ address.recipient_name }}</span>
+                                    <span>{{ address.line1 }}{% if address.line2 %}, {{ address.line2 }}{% endif %}</span>
+                                    <span>{{ address.city }}, {{ address.state }} - {{ address.postal_code }}</span>
+                                    <span>{{ address.phone }}</span>
+                                </span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <label class="address-option new-address-option">
+                    <input
+                        type="radio"
+                        name="address_choice"
+                        value="new"
+                        id="new-address-choice"
+                        {% if not addresses %}checked{% endif %}
+                    >
+                    <span class="address-radio-content">
+                        <strong>Use a new address</strong>
+                        <span>Enter a new delivery address.</span>
+                    </span>
+                </label>
+
+                <div
+                    id="new-address-fields"
+                    class="new-address-fields"
+                    style="display: {% if addresses %}none{% else %}block{% endif %};"
+                >
+                    <div class="form-grid two-columns">
+                        <div class="form-group">
+                            <label for="recipient_name">Recipient Name</label>
+                            <input type="text" id="recipient_name" name="recipient_name" placeholder="Rahul Sharma">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="text" id="phone" name="phone" placeholder="9876543210">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="line1">Address Line 1</label>
+                        <input type="text" id="line1" name="line1" placeholder="House / Flat / Street">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="line2">Address Line 2 <span class="optional-label">Optional</span></label>
+                        <input type="text" id="line2" name="line2" placeholder="Landmark / Area">
+                    </div>
+
+                    <div class="form-grid three-columns">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" placeholder="Patna">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" id="state" name="state" placeholder="Bihar">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="postal_code">Postal Code</label>
+                            <input type="text" id="postal_code" name="postal_code" placeholder="800001">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <input type="text" id="country" name="country" value="India">
+                    </div>
+
+                    <div class="checkbox-row">
+                        <label>
+                            <input type="checkbox" name="save_address" id="save_address">
+                            Save this address to my account
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="make_default" id="make_default">
+                            Make it my default address
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <section class="checkout-card">
+                <div class="checkout-section-title">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h2>Payment Method</h2>
+                        <p>Select how you want to pay.</p>
+                    </div>
+                </div>
+
+                <div class="payment-choice-grid">
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="CARD" checked>
+                        <span>
+                            <strong>Card</strong>
+                            <small>Credit or debit card</small>
+                        </span>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="UPI">
+                        <span>
+                            <strong>UPI</strong>
+                            <small>Pay using UPI</small>
+                        </span>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="COD">
+                        <span>
+                            <strong>Cash on Delivery</strong>
+                            <small>Pay when delivered</small>
+                        </span>
+                    </label>
+                </div>
+            </section>
+
+            <button type="submit" class="btn primary-btn checkout-continue-btn">
+                Continue to Payment
+            </button>
+
+        </div>
+
+        <aside class="checkout-summary">
+            <span class="section-kicker">ORDER SUMMARY</span>
+            <h2>Review Order</h2>
+
+            <div class="checkout-product-list">
+                {% for item in checkout_items %}
+                    <div class="checkout-product-row">
+                        <div>
+                            <strong>{{ item.name }}</strong>
+                            <span>{{ item.quantity }} × ₹{{ "%.2f"|format(item.unit_price) }}</span>
+                        </div>
+                        <strong>₹{{ "%.2f"|format(item.item_total) }}</strong>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <strong>₹{{ "%.2f"|format(subtotal) }}</strong>
+            </div>
+
+            <div class="summary-row">
+                <span>Shipping</span>
+                {% if shipping_charge == 0 %}
+                    <strong>FREE</strong>
+                {% else %}
+                    <strong>₹{{ "%.2f"|format(shipping_charge) }}</strong>
+                {% endif %}
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-total">
+                <span>Total</span>
+                <strong>₹{{ "%.2f"|format(total_amount) }}</strong>
+            </div>
+
+            <p class="shipping-rule">Free shipping on orders of ₹1,000 or more.</p>
+        </aside>
+
+    </form>
+
+</main>
+
+<footer class="footer">
+    <div class="container footer-content">
+        <div>
+            <h3>ShopSphere</h3>
+            <p>Your simple online shopping experience.</p>
+        </div>
+        <p>© 2026 ShopSphere</p>
+    </div>
+</footer>
+
+<script>
+    const newAddressChoice = document.getElementById("new-address-choice");
+    const newAddressFields = document.getElementById("new-address-fields");
+    const savedAddressOptions = document.querySelectorAll('input[name="address_choice"][value="saved"]');
+
+    function toggleNewAddress() {
+        if (!newAddressChoice || !newAddressFields) {
+            return;
+        }
+
+        newAddressFields.style.display = newAddressChoice.checked ? "block" : "none";
+    }
+
+    if (newAddressChoice) {
+        newAddressChoice.addEventListener("change", toggleNewAddress);
+    }
+
+    savedAddressOptions.forEach((radio) => {
+        radio.addEventListener("change", toggleNewAddress);
+    });
+
+    document.querySelectorAll('input[name="address_choice"]').forEach((radio) => {
+        radio.addEventListener("change", function () {
+            const savedAddressId = this.dataset.addressId;
+            let hiddenAddressId = document.getElementById("selected-address-id");
+
+            if (!hiddenAddressId) {
+                hiddenAddressId = document.createElement("input");
+                hiddenAddressId.type = "hidden";
+                hiddenAddressId.name = "address_id";
+                hiddenAddressId.id = "selected-address-id";
+                document.querySelector("form.checkout-layout").appendChild(hiddenAddressId);
+            }
+
+            hiddenAddressId.value = savedAddressId || "";
+        });
+    });
+
+    const checkedSaved = document.querySelector('input[name="address_choice"][value="saved"]:checked');
+
+    if (checkedSaved) {
+        const hiddenAddressId = document.createElement("input");
+        hiddenAddressId.type = "hidden";
+        hiddenAddressId.name = "address_id";
+        hiddenAddressId.id = "selected-address-id";
+        hiddenAddressId.value = checkedSaved.dataset.addressId || "";
+        document.querySelector("form.checkout-layout").appendChild(hiddenAddressId);
+    }
+</script>
+
+</body>
+</html>

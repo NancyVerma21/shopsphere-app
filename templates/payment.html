@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - ShopSphere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container navbar-content">
+        <a href="{{ url_for('home') }}" class="logo">ShopSphere</a>
+        <nav class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('categories_page') }}">Categories</a>
+            <a href="{{ url_for('orders') }}">Orders</a>
+        </nav>
+        <div class="nav-actions">
+            <span class="welcome-user">Hi, {{ current_user_name.split()[0] }}</span>
+            <a href="{{ url_for('logout') }}" class="nav-login">Logout</a>
+            <a href="{{ url_for('cart') }}" class="cart-link">Cart ({{ cart_count }})</a>
+        </div>
+    </div>
+</header>
+
+<main class="container page-main">
+
+    <section class="page-header checkout-heading">
+        <div>
+            <span class="section-kicker">SECURE PAYMENT</span>
+            <h1>Complete Payment</h1>
+            <p>Review your order and complete the simulated payment.</p>
+        </div>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-stack">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('payment') }}" class="checkout-layout">
+
+        <div class="checkout-main">
+
+            <section class="checkout-card">
+                <div class="checkout-section-title">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h2>Payment Details</h2>
+                        <p>Choose your payment method and enter the required details.</p>
+                    </div>
+                </div>
+
+                <div class="payment-choice-grid">
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="CARD" {% if checkout_data.payment_method == 'CARD' %}checked{% endif %}>
+                        <span>
+                            <strong>Card</strong>
+                            <small>Credit or debit card</small>
+                        </span>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="UPI" {% if checkout_data.payment_method == 'UPI' %}checked{% endif %}>
+                        <span>
+                            <strong>UPI</strong>
+                            <small>Pay using UPI</small>
+                        </span>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="COD" {% if checkout_data.payment_method == 'COD' %}checked{% endif %}>
+                        <span>
+                            <strong>Cash on Delivery</strong>
+                            <small>Payment remains pending</small>
+                        </span>
+                    </label>
+                </div>
+
+                <div id="card-fields" class="payment-fields">
+                    <div class="form-group">
+                        <label for="card_number">Card Number</label>
+                        <input
+                            type="text"
+                            id="card_number"
+                            name="card_number"
+                            inputmode="numeric"
+                            maxlength="19"
+                            placeholder="4111 1111 1111 1111"
+                        >
+                    </div>
+
+                    <div class="form-grid two-columns">
+                        <div class="form-group">
+                            <label for="expiry">Expiry</label>
+                            <input
+                                type="text"
+                                id="expiry"
+                                name="expiry"
+                                maxlength="5"
+                                placeholder="12/30"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cvv">CVV</label>
+                            <input
+                                type="password"
+                                id="cvv"
+                                name="cvv"
+                                inputmode="numeric"
+                                maxlength="4"
+                                placeholder="123"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="qa-note">
+                        QA payment simulation: card number ending in <strong>0002</strong> is intentionally declined.
+                    </div>
+                </div>
+
+                <div id="upi-fields" class="payment-fields" style="display:none;">
+                    <div class="form-group">
+                        <label for="upi_id">UPI ID</label>
+                        <input
+                            type="text"
+                            id="upi_id"
+                            name="upi_id"
+                            placeholder="name@upi"
+                        >
+                    </div>
+
+                    <div class="qa-note">
+                        QA payment simulation: <strong>fail@upi</strong> is intentionally declined.
+                    </div>
+                </div>
+
+                <div id="cod-fields" class="payment-fields" style="display:none;">
+                    <div class="cod-box">
+                        <strong>Cash on Delivery</strong>
+                        <p>
+                            Your order will be placed now and the payment will remain in PENDING status until delivery.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="checkout-card address-review-card">
+                <div class="checkout-section-title">
+                    <div class="step-number">✓</div>
+                    <div>
+                        <h2>Delivery Address</h2>
+                        <p>This address will be stored as a snapshot on your order.</p>
+                    </div>
+                </div>
+
+                <div class="address-review">
+                    <strong>{{ checkout_data.recipient_name }}</strong>
+                    <span>{{ checkout_data.line1 }}</span>
+                    {% if checkout_data.line2 %}
+                        <span>{{ checkout_data.line2 }}</span>
+                    {% endif %}
+                    <span>{{ checkout_data.city }}, {{ checkout_data.state }} - {{ checkout_data.postal_code }}</span>
+                    <span>{{ checkout_data.country }}</span>
+                    <span>{{ checkout_data.phone }}</span>
+                </div>
+
+                <a href="{{ url_for('checkout') }}" class="continue-shopping">
+                    ← Change address
+                </a>
+            </section>
+
+            <div class="payment-actions">
+                <a href="{{ url_for('checkout') }}" class="btn secondary-btn">Back</a>
+                <button type="submit" class="btn primary-btn">Place Order</button>
+            </div>
+
+        </div>
+
+        <aside class="checkout-summary">
+            <span class="section-kicker">FINAL TOTAL</span>
+            <h2>Order Summary</h2>
+
+            <div class="checkout-product-list">
+                {% for item in checkout_items %}
+                    <div class="checkout-product-row">
+                        <div>
+                            <strong>{{ item.name }}</strong>
+                            <span>{{ item.quantity }} × ₹{{ "%.2f"|format(item.unit_price) }}</span>
+                        </div>
+                        <strong>₹{{ "%.2f"|format(item.item_total) }}</strong>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <strong>₹{{ "%.2f"|format(subtotal) }}</strong>
+            </div>
+
+            <div class="summary-row">
+                <span>Shipping</span>
+                {% if shipping_charge == 0 %}
+                    <strong>FREE</strong>
+                {% else %}
+                    <strong>₹{{ "%.2f"|format(shipping_charge) }}</strong>
+                {% endif %}
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-total">
+                <span>Total</span>
+                <strong>₹{{ "%.2f"|format(total_amount) }}</strong>
+            </div>
+        </aside>
+
+    </form>
+
+</main>
+
+<footer class="footer">
+    <div class="container footer-content">
+        <div>
+            <h3>ShopSphere</h3>
+            <p>Your simple online shopping experience.</p>
+        </div>
+        <p>© 2026 ShopSphere</p>
+    </div>
+</footer>
+
+<script>
+    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+    const cardFields = document.getElementById("card-fields");
+    const upiFields = document.getElementById("upi-fields");
+    const codFields = document.getElementById("cod-fields");
+
+    function updatePaymentFields() {
+        const selected = document.querySelector('input[name="payment_method"]:checked');
+
+        if (!selected) {
+            return;
+        }
+
+        cardFields.style.display = selected.value === "CARD" ? "block" : "none";
+        upiFields.style.display = selected.value === "UPI" ? "block" : "none";
+        codFields.style.display = selected.value === "COD" ? "block" : "none";
+    }
+
+    paymentRadios.forEach((radio) => {
+        radio.addEventListener("change", updatePaymentFields);
+    });
+
+    updatePaymentFields();
+</script>
+
+</body>
+</html>

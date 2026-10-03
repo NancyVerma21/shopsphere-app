@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Categories - ShopSphere</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="container navbar-content">
+
+        <a
+            href="{{ url_for('home') }}"
+            class="logo"
+        >
+            ShopSphere
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="{{ url_for('products') }}">
+                Products
+            </a>
+
+            <a
+                href="{{ url_for('categories_page') }}"
+                class="active"
+            >
+                Categories
+            </a>
+
+            <a href="{{ url_for('orders') }}">
+                Orders
+            </a>
+
+        </nav>
+
+        <div class="nav-actions">
+
+            {% if logged_in %}
+
+                <span class="welcome-user">
+                    Hi, {{ current_user_name.split()[0] }}
+                </span>
+
+                <a
+                    href="{{ url_for('logout') }}"
+                    class="nav-login"
+                >
+                    Logout
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{{ url_for('login') }}"
+                    class="nav-login"
+                >
+                    Login
+                </a>
+
+            {% endif %}
+
+            <a
+                href="{{ url_for('cart') }}"
+                class="cart-link"
+            >
+                Cart ({{ cart_count }})
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="container page-main">
+
+    <section class="page-header">
+
+        <div>
+
+            <span class="section-kicker">
+                SHOP BY CATEGORY
+            </span>
+
+            <h1>
+                Categories
+            </h1>
+
+            <p>
+                Explore the ShopSphere catalog by product category.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    {% if categories %}
+
+        <section class="category-page-grid">
+
+            {% for category in categories %}
+
+                <a
+                    href="{{ url_for('products', category=category.name) }}"
+                    class="category-large-card"
+                >
+
+                    <div class="category-large-icon">
+
+                        {% if category.name == "Electronics" %}
+                            📱
+                        {% elif category.name == "Fashion" %}
+                            👕
+                        {% elif category.name == "Home & Living" %}
+                            🏠
+                        {% else %}
+                            🎧
+                        {% endif %}
+
+                    </div>
+
+                    <h2>
+                        {{ category.name }}
+                    </h2>
+
+                    <p>
+                        {{ category.product_count }} product(s)
+                        available.
+                    </p>
+
+                    <span>
+                        View products →
+                    </span>
+
+                </a>
+
+            {% endfor %}
+
+        </section>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                📂
+            </div>
+
+            <h2>
+                No categories available
+            </h2>
+
+            <p>
+                Categories could not be loaded.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</main>
+
+
+<footer class="footer">
+
+    <div class="container footer-content">
+
+        <div>
+            <h3>ShopSphere</h3>
+            <p>Your simple online shopping experience.</p>
+        </div>
+
+        <p>
+            © 2026 ShopSphere
+        </p>
+
+    </div>
+
+</footer>
+
+</body>
+</html>

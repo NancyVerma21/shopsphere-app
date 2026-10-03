@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Product Not Found - ShopSphere</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <main class="not-found-page">
+
+        <div class="not-found-card">
+
+            <div class="empty-state-icon">
+                🔍
+            </div>
+
+            <h1>
+                Product Not Found
+            </h1>
+
+            <p>
+                We couldn't find product
+                <strong>{{ sku }}</strong>.
+            </p>
+
+            <a
+                href="/products"
+                class="btn primary-btn"
+            >
+                Back to Products
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

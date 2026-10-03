@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ product.name }} - ShopSphere</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="container navbar-content">
+
+        <a
+            href="{{ url_for('home') }}"
+            class="logo"
+        >
+            ShopSphere
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a
+                href="{{ url_for('products') }}"
+                class="active"
+            >
+                Products
+            </a>
+
+            <a href="{{ url_for('categories_page') }}">
+                Categories
+            </a>
+
+            <a href="{{ url_for('orders') }}">
+                Orders
+            </a>
+
+        </nav>
+
+        <div class="nav-actions">
+
+            {% if logged_in %}
+
+                <span class="welcome-user">
+                    Hi, {{ current_user_name.split()[0] }}
+                </span>
+
+                <a
+                    href="{{ url_for('logout') }}"
+                    class="nav-login"
+                >
+                    Logout
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{{ url_for('login') }}"
+                    class="nav-login"
+                >
+                    Login
+                </a>
+
+            {% endif %}
+
+            <a
+                href="{{ url_for('cart') }}"
+                class="cart-link"
+            >
+                Cart ({{ cart_count }})
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <div class="breadcrumb">
+
+        <a href="{{ url_for('products') }}">
+            Products
+        </a>
+
+        <span>/</span>
+
+        <span>
+            {{ product.name }}
+        </span>
+
+    </div>
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            <div class="flash-stack">
+
+                {% for category, message in messages %}
+
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <section class="product-details">
+
+        <div class="product-details-image">
+
+            <img
+                src="{{ url_for('static', filename='images/' ~ product.sku|lower ~ '.svg') }}"
+                alt="{{ product.name }}"
+            >
+
+        </div>
+
+
+        <div class="product-details-content">
+
+            <span class="product-category">
+                {{ product.category_name }}
+            </span>
+
+
+            <h1>
+                {{ product.name }}
+            </h1>
+
+
+            <p class="product-sku">
+                SKU: {{ product.sku }}
+            </p>
+
+
+            <div class="product-details-price">
+                ₹{{ "%.2f"|format(product.price) }}
+            </div>
+
+
+            <p class="product-details-description">
+                {{ product.description }}
+            </p>
+
+
+            <div class="product-stock-box">
+
+                {% if product.stock_qty > 0 %}
+
+                    <div class="stock-status available">
+                        In Stock
+                    </div>
+
+                    <p>
+                        {{ product.stock_qty }} units available
+                    </p>
+
+                {% else %}
+
+                    <div class="stock-status unavailable">
+                        Out of Stock
+                    </div>
+
+                    <p>
+                        This product is currently unavailable.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="product-actions">
+
+                {% if product.stock_qty > 0 %}
+
+                    {% if logged_in %}
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('add_to_cart', sku=product.sku) }}"
+                        >
+
+                            <button
+                                class="btn primary-btn"
+                                type="submit"
+                            >
+                                Add to Cart
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        <a
+                            class="btn primary-btn"
+                            href="{{ url_for('login', next=url_for('product_details', sku=product.sku)) }}"
+                        >
+                            Login to Add to Cart
+                        </a>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <button
+                        class="btn btn-disabled"
+                        type="button"
+                        disabled
+                    >
+                        Out of Stock
+                    </button>
+
+                {% endif %}
+
+                <a
+                    href="{{ url_for('cart') }}"
+                    class="btn secondary-btn"
+                >
+                    View Cart
+                </a>
+
+            </div>
+
+
+            <div class="product-meta">
+
+                <div>
+                    <strong>Category:</strong>
+                    {{ product.category_name }}
+                </div>
+
+                <div>
+                    <strong>Product ID:</strong>
+                    {{ product.id }}
+                </div>
+
+                <div>
+                    <strong>SKU:</strong>
+                    {{ product.sku }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+
+    <div class="container footer-content">
+
+        <div>
+            <h3>ShopSphere</h3>
+            <p>Your simple online shopping experience.</p>
+        </div>
+
+        <p>
+            © 2026 ShopSphere
+        </p>
+
+    </div>
+
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+SHOPSPHERE FINAL BUGGY AUT — START HERE
+
+This is ONE complete project folder. Use it as the replacement for your older ShopSphere app.
+
+IMPORTANT: Your MySQL database is NOT included and is not changed by this package. Your .env is also not included. Keep your current .env file.
+
+Recommended replacement steps:
+1. Stop Flask.
+2. Rename your current folder C:\Users\hp\Desktop\shopsphere-app to shopsphere-app-backup.
+3. Extract this folder to C:\Users\hp\Desktop.
+4. Rename the extracted folder shopsphere-final-buggy-aut to shopsphere-app.
+5. Copy C:\Users\hp\Desktop\shopsphere-app-backup\.env into C:\Users\hp\Desktop\shopsphere-app\.env
+6. Open PowerShell in the new folder.
+7. Create a new venv: python -m venv .venv
+8. Activate it: .\.venv\Scripts\Activate.ps1
+9. Install: pip install -r requirements.txt
+10. Start: python app.py
+
+Do NOT modify the seeded defects. They are intentionally part of the SDET Application Under Test.

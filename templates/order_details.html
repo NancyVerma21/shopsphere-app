@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ order.order_number }} - ShopSphere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container navbar-content">
+        <a href="{{ url_for('home') }}" class="logo">ShopSphere</a>
+        <nav class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('categories_page') }}">Categories</a>
+            <a href="{{ url_for('orders') }}" class="active">Orders</a>
+        </nav>
+        <div class="nav-actions">
+            <span class="welcome-user">Hi, {{ current_user_name.split()[0] }}</span>
+            <a href="{{ url_for('logout') }}" class="nav-login">Logout</a>
+            <a href="{{ url_for('cart') }}" class="cart-link">Cart ({{ cart_count }})</a>
+        </div>
+    </div>
+</header>
+
+<main class="container page-main">
+
+    <div class="breadcrumb">
+        <a href="{{ url_for('orders') }}">Orders</a>
+        <span>/</span>
+        <span>{{ order.order_number }}</span>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-stack">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <section class="order-detail-header">
+        <div>
+            <span class="section-kicker">ORDER DETAILS</span>
+            <h1>{{ order.order_number }}</h1>
+            <p>{{ order.created_at.strftime('%d %b %Y, %I:%M %p') }}</p>
+        </div>
+
+        <div class="order-status-block order-detail-status">
+            <span class="order-status status-{{ order.status|lower }}">
+                {{ order.status }}
+            </span>
+            <strong>₹{{ "%.2f"|format(order.total_amount) }}</strong>
+        </div>
+    </section>
+
+    <section class="order-detail-grid">
+
+        <div>
+            <div class="checkout-card">
+                <div class="checkout-section-title">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h2>Items</h2>
+                        <p>Products included in this order.</p>
+                    </div>
+                </div>
+
+                <div class="order-items-table">
+                    {% for item in items %}
+                        <div class="order-item-row">
+                            <div>
+                                <strong>{{ item.product_name }}</strong>
+                                <span>{{ item.quantity }} × ₹{{ "%.2f"|format(item.unit_price) }}</span>
+                            </div>
+                            <strong>₹{{ "%.2f"|format(item.line_total) }}</strong>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="checkout-card">
+                <div class="checkout-section-title">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h2>Delivery Address</h2>
+                        <p>Address captured when the order was placed.</p>
+                    </div>
+                </div>
+
+                <div class="address-review">
+                    <strong>{{ order.shipping_recipient_name }}</strong>
+                    <span>{{ order.shipping_line1 }}</span>
+                    {% if order.shipping_line2 %}
+                        <span>{{ order.shipping_line2 }}</span>
+                    {% endif %}
+                    <span>{{ order.shipping_city }}, {{ order.shipping_state }} - {{ order.shipping_postal_code }}</span>
+                    <span>{{ order.shipping_country }}</span>
+                    <span>{{ order.shipping_phone }}</span>
+                </div>
+            </div>
+        </div>
+
+        <aside>
+            <div class="checkout-summary">
+                <span class="section-kicker">PAYMENT</span>
+                <h2>Payment</h2>
+
+                <div class="summary-row">
+                    <span>Method</span>
+                    <strong>{{ order.payment_method }}</strong>
+                </div>
+
+                <div class="summary-row">
+                    <span>Status</span>
+                    <strong>{{ order.payment_status }}</strong>
+                </div>
+
+                <div class="summary-row">
+                    <span>Reference</span>
+                    <strong class="reference-text">{{ order.transaction_reference or 'N/A' }}</strong>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <strong>₹{{ "%.2f"|format(order.subtotal) }}</strong>
+                </div>
+
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    {% if order.shipping_charge == 0 %}
+                        <strong>FREE</strong>
+                    {% else %}
+                        <strong>₹{{ "%.2f"|format(order.shipping_charge) }}</strong>
+                    {% endif %}
+                </div>
+
+                <div class="summary-total">
+                    <span>Total</span>
+                    <strong>₹{{ "%.2f"|format(order.total_amount) }}</strong>
+                </div>
+
+                {% if order.status in ['PLACED', 'PROCESSING'] %}
+                    <form
+                        method="POST"
+                        action="{{ url_for('cancel_order', order_number=order.order_number) }}"
+                    >
+                        <button type="submit" class="btn danger-btn full-width-btn">
+                            Cancel Order
+                        </button>
+                    </form>
+                {% endif %}
+
+                <a href="{{ url_for('orders') }}" class="continue-shopping">
+                    ← Back to Orders
+                </a>
+            </div>
+        </aside>
+
+    </section>
+
+</main>
+
+<footer class="footer">
+    <div class="container footer-content">
+        <div>
+            <h3>ShopSphere</h3>
+            <p>Your simple online shopping experience.</p>
+        </div>
+        <p>© 2026 ShopSphere</p>
+    </div>
+</footer>
+
+</body>
+</html>

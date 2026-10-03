@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#f8fafc"/>
+          <stop offset="100%" stop-color="#e2e8f0"/>
+        </linearGradient>
+        <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="18" stdDeviation="18" flood-opacity="0.18"/>
+        </filter>
+      </defs>
+      <rect width="800" height="600" rx="36" fill="url(#bg)"/>
+      <ellipse cx="400" cy="500" rx="220" ry="34" fill="#94a3b8" opacity="0.25"/>
+      <g filter="url(#shadow)">
+    <path d="M235 380h330l-70-70H305z" fill="#475569"/>
+        <path d="M330 310l55-105h35l50 105" fill="none" stroke="#475569" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M260 400h280" stroke="#0f172a" stroke-width="12" stroke-linecap="round" opacity=".28"/>
+        <rect x="280" y="190" width="240" height="110" rx="10" fill="#0f172a" opacity=".85"/></g>
+      <text x="400" y="565" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+            font-size="26" font-weight="700" fill="#334155">Laptop Stand</text>
+    </svg>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ShopSphere - Online Shopping</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="container navbar-content">
+
+        <a
+            href="{{ url_for('home') }}"
+            class="logo"
+        >
+            ShopSphere
+        </a>
+
+        <nav class="nav-links">
+
+            <a
+                href="{{ url_for('home') }}"
+                class="active"
+            >
+                Home
+            </a>
+
+            <a href="{{ url_for('products') }}">
+                Products
+            </a>
+
+            <a href="{{ url_for('categories_page') }}">
+                Categories
+            </a>
+
+            <a href="{{ url_for('orders') }}">
+                Orders
+            </a>
+
+        </nav>
+
+        <div class="nav-actions">
+
+            {% if logged_in %}
+
+                <span class="welcome-user">
+                    Hi, {{ current_user_name.split()[0] }}
+                </span>
+
+                <a
+                    href="{{ url_for('logout') }}"
+                    class="nav-login"
+                >
+                    Logout
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{{ url_for('login') }}"
+                    class="nav-login"
+                >
+                    Login
+                </a>
+
+            {% endif %}
+
+            <a
+                href="{{ url_for('cart') }}"
+                class="cart-link"
+            >
+                Cart ({{ cart_count }})
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main>
+
+    <section class="hero-section">
+
+        <div class="container hero-grid">
+
+            <div class="hero-copy">
+
+                <div class="eyebrow">
+                    SMART SHOPPING • SIMPLE EXPERIENCE
+                </div>
+
+                <h1>
+                    Everything you need,
+                    <span>all in one place.</span>
+                </h1>
+
+                <p>
+                    Discover electronics, fashion, home essentials
+                    and everyday accessories in one simple shopping experience.
+                </p>
+
+                <div class="hero-actions">
+
+                    <a
+                        href="{{ url_for('products') }}"
+                        class="btn primary-btn"
+                    >
+                        Shop Products
+                    </a>
+
+                    <a
+                        href="{{ url_for('categories_page') }}"
+                        class="btn secondary-btn"
+                    >
+                        Browse Categories
+                    </a>
+
+                </div>
+
+                <div class="hero-stats">
+
+                    <div>
+                        <strong>11+</strong>
+                        <span>Products</span>
+                    </div>
+
+                    <div>
+                        <strong>4</strong>
+                        <span>Categories</span>
+                    </div>
+
+                    <div>
+                        <strong>24/7</strong>
+                        <span>Shopping</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="hero-visual">
+
+                <div class="hero-orb orb-one"></div>
+                <div class="hero-orb orb-two"></div>
+
+                <div class="shopping-card">
+
+                    <div class="shopping-card-top">
+                        <span>Featured</span>
+                        <span>ShopSphere</span>
+                    </div>
+
+                    <div class="shopping-bag-icon">
+                        🛍️
+                    </div>
+
+                    <h2>
+                        Smart shopping starts here.
+                    </h2>
+
+                    <p>
+                        Quality products, clear information and
+                        a smooth checkout journey.
+                    </p>
+
+                    <a
+                        href="{{ url_for('products') }}"
+                        class="card-link"
+                    >
+                        Explore products →
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="categories-section">
+
+        <div class="container">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-kicker">
+                        SHOP BY CATEGORY
+                    </span>
+
+                    <h2>
+                        Find what you need
+                    </h2>
+
+                    <p>
+                        Explore products by category.
+                    </p>
+                </div>
+
+                <a
+                    href="{{ url_for('categories_page') }}"
+                    class="text-link"
+                >
+                    View all categories →
+                </a>
+
+            </div>
+
+
+            <div class="category-grid">
+
+                {% for category in categories %}
+
+                <a
+                    href="{{ url_for('products', category=category.name) }}"
+                    class="category-card"
+                >
+
+                    <div class="category-card-icon">
+
+                        {% if category.name == "Electronics" %}
+                            📱
+                        {% elif category.name == "Fashion" %}
+                            👕
+                        {% elif category.name == "Home & Living" %}
+                            🏠
+                        {% else %}
+                            🎧
+                        {% endif %}
+
+                    </div>
+
+                    <div class="category-card-body">
+
+                        <h3>
+                            {{ category.name }}
+                        </h3>
+
+                        <p>
+                            {{ category.product_count }} product(s)
+                        </p>
+
+                        <span>
+                            Explore →
+                        </span>
+
+                    </div>
+
+                </a>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="featured-section">
+
+        <div class="container">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-kicker">
+                        FEATURED PRODUCTS
+                    </span>
+
+                    <h2>
+                        Popular picks
+                    </h2>
+
+                    <p>
+                        A few products from our current catalog.
+                    </p>
+                </div>
+
+                <a
+                    href="{{ url_for('products') }}"
+                    class="text-link"
+                >
+                    View all products →
+                </a>
+
+            </div>
+
+
+            <div class="featured-grid">
+
+                {% for product in featured_products %}
+
+                <article class="featured-card">
+
+                    <a
+                        href="{{ url_for('product_details', sku=product.sku) }}"
+                        class="featured-image"
+                    >
+
+                        <img
+                            src="{{ url_for('static', filename='images/' ~ product.sku|lower ~ '.svg') }}"
+                            alt="{{ product.name }}"
+                        >
+
+                    </a>
+
+                    <div class="featured-content">
+
+                        <span class="product-category">
+                            {{ product.category_name }}
+                        </span>
+
+                        <h3>
+                            <a
+                                href="{{ url_for('product_details', sku=product.sku) }}"
+                            >
+                                {{ product.name }}
+                            </a>
+                        </h3>
+
+                        <div class="featured-bottom">
+
+                            <strong>
+                                ₹{{ "%.2f"|format(product.price) }}
+                            </strong>
+
+                            {% if product.stock_qty > 0 %}
+
+                                <span class="mini-stock in-stock">
+                                    In stock
+                                </span>
+
+                            {% else %}
+
+                                <span class="mini-stock out-stock">
+                                    Out of stock
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="benefits-section">
+
+        <div class="container benefits-grid">
+
+            <div class="benefit-card">
+                <div class="benefit-icon">🚚</div>
+                <div>
+                    <h3>Fast Delivery</h3>
+                    <p>Reliable delivery for your orders.</p>
+                </div>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">🔒</div>
+                <div>
+                    <h3>Secure Shopping</h3>
+                    <p>Protected customer accounts.</p>
+                </div>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">💳</div>
+                <div>
+                    <h3>Easy Checkout</h3>
+                    <p>A simple checkout experience.</p>
+                </div>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">📦</div>
+                <div>
+                    <h3>Order Tracking</h3>
+                    <p>Track your purchases in one place.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+
+    <div class="container footer-content">
+
+        <div>
+            <h3>ShopSphere</h3>
+            <p>
+                Your simple online shopping experience.
+            </p>
+        </div>
+
+        <div>
+            <p>
+                © 2026 ShopSphere
+            </p>
+        </div>
+
+    </div>
+
+</footer>
+
+</body>
+</html>

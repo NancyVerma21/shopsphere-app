@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed - ShopSphere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container navbar-content">
+        <a href="{{ url_for('home') }}" class="logo">ShopSphere</a>
+        <nav class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('categories_page') }}">Categories</a>
+            <a href="{{ url_for('orders') }}">Orders</a>
+        </nav>
+        <div class="nav-actions">
+            <span class="welcome-user">Hi, {{ current_user_name.split()[0] }}</span>
+            <a href="{{ url_for('logout') }}" class="nav-login">Logout</a>
+            <a href="{{ url_for('cart') }}" class="cart-link">Cart ({{ cart_count }})</a>
+        </div>
+    </div>
+</header>
+
+<main class="container page-main">
+
+    <section class="confirmation-card">
+        <div class="confirmation-icon">✓</div>
+
+        <span class="section-kicker">ORDER CONFIRMED</span>
+
+        <h1>Thank you for your order!</h1>
+
+        <p class="confirmation-message">
+            Your order has been successfully placed.
+        </p>
+
+        <div class="confirmation-number">
+            <span>Order Number</span>
+            <strong>{{ order.order_number }}</strong>
+        </div>
+
+        <div class="confirmation-total">
+            <span>Total Amount</span>
+            <strong>₹{{ "%.2f"|format(order.total_amount) }}</strong>
+        </div>
+
+        <div class="confirmation-payment">
+            <span>Payment Method</span>
+            <strong>{{ order.payment_method }}</strong>
+            <span>Payment Status</span>
+            <strong>{{ order.payment_status }}</strong>
+        </div>
+
+        {% if order.payment_method == 'COD' %}
+            <div class="cod-box confirmation-cod">
+                <strong>Cash on Delivery</strong>
+                <p>
+                    Your order is placed. Payment will remain pending until delivery.
+                </p>
+            </div>
+        {% endif %}
+
+        <div class="confirmation-actions">
+            <a href="{{ url_for('order_details', order_number=order.order_number) }}" class="btn primary-btn">
+                View Order
+            </a>
+            <a href="{{ url_for('products') }}" class="btn secondary-btn">
+                Continue Shopping
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <div class="container footer-content">
+        <div>
+            <h3>ShopSphere</h3>
+            <p>Your simple online shopping experience.</p>
+        </div>
+        <p>© 2026 ShopSphere</p>
+    </div>
+</footer>
+
+</body>
+</html>

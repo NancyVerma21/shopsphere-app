@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ShopSphere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="navbar">
+    <div class="container navbar-content">
+        <a href="/" class="logo">ShopSphere</a>
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="/products">Products</a>
+            <a href="/orders">Orders</a>
+            <a href="/admin" class="active">Admin</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container" style="padding: 60px 0;">
+    <section class="filters-card">
+        <h1 style="margin-bottom: 10px;">Admin Dashboard</h1>
+        <p style="color: #64748b; margin-bottom: 20px;">
+            Customer and administrative controls are visible on this demonstration page.
+        </p>
+        <div class="product-meta">
+            <div><strong>Current user:</strong> {{ current_user_name }}</div>
+            <div><strong>Role:</strong> {{ current_user_role }}</div>
+        </div>
+    </section>
+</main>
+</body>
+</html>
